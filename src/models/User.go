@@ -14,5 +14,5 @@ type User struct {
 	Password  string             `json:"password,omitempty" bson:"password,omitempty"`
 	CreatedAt time.Time          `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 	UpdatedAt time.Time          `json:"updatedAt,omitempty" bson:"updatedAt,omitempty"`
-	Current   uint64             `json:"current,omitempty" bson:"current,omitempty`
+	Current   float64            `json:"current,omitempty" bson:"current,omitempty`
 }

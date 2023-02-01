@@ -7,8 +7,8 @@ import (
 
 var userRouters = []Route{
 	{
-		URI:      "/",
-		Method:   http.MethodGet,
+		URI:      "/user/create",
+		Method:   http.MethodPost,
 		Function: controllers.CreateAUser,
 		Auth:     false,
 	},

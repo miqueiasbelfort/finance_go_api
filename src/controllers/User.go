@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"api/src/cryptography"
 	"api/src/database"
 	"api/src/models"
+	"api/src/verifications"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -27,9 +29,22 @@ func CreateAUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	requestVerification := verifications.CreateUser(user)
+	if requestVerification {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	passwordHash, err := cryptography.Hash(user.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
 	user.ID = primitive.NewObjectID()
 	user.CreatedAt = primitive.NewObjectID().Timestamp()
 	user.UpdatedAt = primitive.NilObjectID.Timestamp()
+	user.Password = string(passwordHash)
 
 	collection := client.Database("golang").Collection("users")
 

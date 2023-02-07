@@ -109,3 +109,22 @@ func GetAUser(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
+
+func UpdateAUser(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	Id, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	var user models.User
+
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+}

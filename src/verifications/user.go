@@ -1,10 +1,19 @@
 package verifications
 
-import "api/src/models"
+import (
+	"api/src/models"
+	"errors"
+)
 
-func CreateUser(user models.User) bool {
+func CreateUser(user models.User) error {
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
-		return true
+		return errors.New("Fill all fields to create a user")
 	}
-	return false
+	return nil
+}
+func UpdateUser(user models.User) error {
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" {
+		return errors.New("Fill all fields to update a user")
+	}
+	return nil
 }

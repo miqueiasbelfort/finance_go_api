@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -42,8 +43,9 @@ func CreateAUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestVerification := verifications.CreateUser(user)
-	if requestVerification {
+	if requestVerification != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(requestVerification.Error()))
 		return
 	}
 
@@ -126,5 +128,34 @@ func UpdateAUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	err = verifications.UpdateUser(user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	filter := bson.M{"_id": Id}
+	update := bson.M{"$set": user}
+
+	// Data base connection
+	client, err := database.ConnectionDB()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer client.Disconnect(context.TODO())
+
+	collection := client.Database("golang").Collection("users")
+
+	result, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	json.NewEncoder(w).Encode(result)
 
 }

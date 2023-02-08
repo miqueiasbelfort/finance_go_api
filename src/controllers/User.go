@@ -57,7 +57,7 @@ func CreateAUser(w http.ResponseWriter, r *http.Request) {
 
 	user.ID = primitive.NewObjectID()
 	user.CreatedAt = primitive.NewObjectID().Timestamp()
-	user.UpdatedAt = primitive.NilObjectID.Timestamp()
+	user.UpdatedAt = primitive.NewObjectID().Timestamp()
 	user.Password = string(passwordHash)
 
 	collection := client.Database("golang").Collection("users")
@@ -146,6 +146,8 @@ func UpdateAUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer client.Disconnect(context.TODO())
+
+	user.UpdatedAt = primitive.NewObjectID().Timestamp()
 
 	collection := client.Database("golang").Collection("users")
 

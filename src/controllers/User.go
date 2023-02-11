@@ -16,13 +16,14 @@ import (
 )
 
 type UserResponse struct {
-	ID        primitive.ObjectID `json:"id" bson:"_id"`
-	FirstName string             `json:"firstname" bson:"firstname"`
-	LastName  string             `json:"lastname" bson:"lastname"`
-	Email     string             `json:"email" bson:"email"`
-	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
-	Current   float64            `json:"current" bson:"current`
+	ID        primitive.ObjectID   `json:"id" bson:"_id"`
+	FirstName string               `json:"firstname" bson:"firstname"`
+	LastName  string               `json:"lastname" bson:"lastname"`
+	Email     string               `json:"email" bson:"email"`
+	CreatedAt time.Time            `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time            `json:"updatedAt" bson:"updatedAt"`
+	Following []primitive.ObjectID `json:"following"`
+	Followers []primitive.ObjectID `json:"followers"`
 }
 
 func CreateAUser(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +78,7 @@ func GetAUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	Id, err := primitive.ObjectIDFromHex(params["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -107,7 +108,6 @@ func GetAUser(w http.ResponseWriter, r *http.Request) {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-		Current:   user.Current,
 	})
 
 }
@@ -160,4 +160,13 @@ func UpdateAUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 	json.NewEncoder(w).Encode(result)
 
+}
+
+func AddFollowings(w http.ResponseWriter, r *http.Request) {
+	// params := mux.Vars(r)
+	// Id, err := primitive.ObjectIDFromHex(params["id"])
+	// if err != nil {
+	// 	w.WriteHeader(http.StatusUnprocessableEntity)
+	// 	return
+	// }
 }

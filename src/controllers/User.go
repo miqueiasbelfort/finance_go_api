@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/cryptography"
 	"api/src/database"
 	"api/src/models"
@@ -24,6 +25,11 @@ type UserResponse struct {
 	UpdatedAt time.Time            `json:"updatedAt" bson:"updatedAt"`
 	Following []primitive.ObjectID `json:"following"`
 	Followers []primitive.ObjectID `json:"followers"`
+}
+
+type loginAUser struct {
+	Email    string `json:"email" bson:"email"`
+	Password string `json:"password" bson:"password"`
 }
 
 func CreateAUser(w http.ResponseWriter, r *http.Request) {
@@ -159,6 +165,56 @@ func UpdateAUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 	json.NewEncoder(w).Encode(result)
+
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+
+	var loginBody loginAUser
+	var user models.User
+
+	// Trasforme a json in a struc
+	err := json.NewDecoder(r.Body).Decode(&loginBody)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid request body"))
+		return
+	}
+
+	// Data base connection
+	client, err := database.ConnectionDB()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer client.Disconnect(context.TODO())
+
+	collection := client.Database("golang").Collection("users")
+
+	// Get a user in the database
+	err = collection.FindOne(context.Background(), models.User{Email: loginBody.Email}).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("User not found!"))
+		return
+	}
+
+	//Check the password is compative with the database password
+	if err = cryptography.VerifyPassword(loginBody.Password, user.Password); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Password is incorrect"))
+		return
+	}
+
+	// Create a new Token
+	token, err := authentication.CreateAToken(user.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Erro in create a token"))
+		return
+	}
+
+	json.NewEncoder(w).Encode(token)
 
 }
 

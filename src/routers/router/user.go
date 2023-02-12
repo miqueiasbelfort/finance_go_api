@@ -30,4 +30,10 @@ var userRouters = []Route{
 		Function: controllers.AddFollowings,
 		Auth:     false,
 	},
+	{
+		URI:      "/user/login",
+		Method:   http.MethodPost,
+		Function: controllers.Login,
+		Auth:     false,
+	},
 }

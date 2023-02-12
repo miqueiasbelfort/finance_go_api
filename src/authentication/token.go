@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func CreateAToken(userID primitive.ObjectID) string {
+func CreateAToken(userID primitive.ObjectID) (string, error) {
 
 	permissions := jwt.MapClaims{}
 	permissions["authorized"] = true
@@ -15,6 +15,5 @@ func CreateAToken(userID primitive.ObjectID) string {
 	permissions["userID"] = userID
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
-
-	return token.SignedString("Hello World")
+	return token.SignedString([]byte("Heloo World"))
 }

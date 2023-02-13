@@ -26,7 +26,7 @@ var userRouters = []Route{
 	},
 	{
 		URI:      "/user/follower/{id}",
-		Method:   http.MethodPut,
+		Method:   http.MethodGet,
 		Function: controllers.AddFollowings,
 		Auth:     false,
 	},

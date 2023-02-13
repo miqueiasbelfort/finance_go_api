@@ -47,6 +47,7 @@ func getAToken(r *http.Request) string {
 		return strings.Split(token, " ")[1]
 	}
 
+	fmt.Println("Don't have a token")
 	return ""
 }
 
@@ -55,4 +56,19 @@ func getAVerificationKey(token *jwt.Token) (interface{}, error) {
 		return nil, fmt.Errorf("Unexpected signature method! %v", token.Header["alg"])
 	}
 	return "123456789", nil
+}
+
+func GetUserIDbyToken(r *http.Request) (interface{}, error) {
+	tokenString := getAToken(r)
+	token, erro := jwt.Parse(tokenString, getAVerificationKey)
+	if erro != nil {
+		return primitive.NilObjectID, erro
+	}
+
+	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := permissions["userID"]
+		return userID, nil
+	}
+
+	return nil, errors.New("Token is invalid")
 }

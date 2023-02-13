@@ -219,10 +219,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddFollowings(w http.ResponseWriter, r *http.Request) {
-	// params := mux.Vars(r)
-	// Id, err := primitive.ObjectIDFromHex(params["id"])
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusUnprocessableEntity)
-	// 	return
-	// }
+
+	params := mux.Vars(r)
+	paramsID, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	tokenID, err := authentication.GetUserIDbyToken(r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Erro on token"))
+		return
+	}
+
+	if paramsID == tokenID {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("You can't follow you"))
+		return
+	}
+
+	json.NewEncoder(w).Encode(tokenID)
+
 }
